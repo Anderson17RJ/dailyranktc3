@@ -5,16 +5,20 @@ import { fileURLToPath } from "url";
 
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/api/top50", (req, res) => {
-  const python = spawn("python", ["scraper.py"]);
+  const python = spawn("python3", ["scraper.py"]);
   let data = "";
 
   python.stdout.on("data", (chunk) => {
     data += chunk.toString();
+  });
+
+  python.stderr.on("data", (chunk) => {
+  console.error("Erro no scraper:", chunk.toString());
   });
 
   python.on("close", () => {
