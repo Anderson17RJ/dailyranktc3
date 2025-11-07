@@ -33,6 +33,15 @@ app.get("/api/top50", (req, res) => {
   });
 });
 
+app.get("/teste-scraper", (req, res) => {
+  const python = spawn("python3", ["scraper.py"]);
+  let data = "";
+
+  python.stdout.on("data", (chunk) => data += chunk.toString());
+  python.on("close", () => res.send(`<pre>${data}</pre>`));
+});
+
+
 app.listen(PORT, () => {
   console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
 });
