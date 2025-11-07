@@ -11,24 +11,15 @@ HEADERS = {
 }
 logging.basicConfig(level=logging.DEBUG)
 
-def get_top50():
-    scraper = cloudscraper.create_scraper(
-        browser={"custom": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/142.0.0.0 Safari/537.36"}
-    )
-
-    
-
+def get_top50(scraper):
     url = f"{BASE_URL}/api/v1/stats/killers?country=&character=&level="
     r = scraper.get(url,headers=HEADERS, timeout=15)
-    data = r.json()
     print(r.status_code)
     print(r.text[:500])
+    data = r.json()
     return data["killers"][:50]
 
-def fetch_user(user_id):
-    scraper = cloudscraper.create_scraper(
-        browser={"custom": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/142.0.0.0 Safari/537.36"}
-    )
+def fetch_user(scraper, user_id):
     url = f"{BASE_URL}/api/v1/user/{user_id}/stats"
     r = scraper.get(url,headers=HEADERS, timeout=15)
     data = r.json()
@@ -44,7 +35,11 @@ def fetch_user(user_id):
 
 
 if __name__ == "__main__":
-    top50 = get_top50()
+    scraper = cloudscraper.create_scraper(
+    browser={"custom": HEADERS["User-Agent"]}
+    )
+
+    top50 = get_top50(scraper)
 
     with ThreadPoolExecutor(max_workers=10) as executor:
         results = list(executor.map(lambda p: fetch_user(p["user"]["id"]), top50))
