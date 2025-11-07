@@ -1,14 +1,18 @@
 import cloudscraper
 import json
 from concurrent.futures import ThreadPoolExecutor
+import logging
 
 BASE_URL = "https://www.thecrims.com"
+logging.basicConfig(level=logging.DEBUG)
 
 def get_top50():
     scraper = cloudscraper.create_scraper()
     url = f"{BASE_URL}/api/v1/stats/killers?country=&character=&level="
-    r = scraper.get(url)
+    r = scraper.get(url, timeout=10)
     data = r.json()
+    print(r.status_code)
+    print(r.text[:500])
     return data["killers"][:50]
 
 def fetch_user(user_id):
